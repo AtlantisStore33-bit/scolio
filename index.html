@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCOLIO    </title>
+    <!-- تحميل Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- استخدام خط مناسب للغة العربية (Cairo) -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #f7f9fb;
+        }
+        /* الألوان الجديدة: أزرق سماوي/بحري (#0e7490) وبرتقالي للعروض (#f97316) */
+        .text-primary { color: #0e7490; }
+        .bg-primary { background-color: #0e7490; }
+        .text-secondary { color: #f97316; }
+        .border-secondary { border-color: #f97316; }
+        /* تصميم زر CTA لافت للنظر */
+        .cta-button {
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        }
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+        }
+        /* تصميم زر الواتساب العائم */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 20px;
+            left: 20px; /* يسار الشاشة في تصميم RTL */
+            z-index: 100;
+            background-color: #25d366;
+            color: white;
+            padding: 12px;
+            border-radius: 50%;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s;
+        }
+        .whatsapp-float:hover {
+            transform: scale(1.1);
+        }
+        /* Toast Notification */
+        #notification-toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 16px;
+            positi0on: fixed;
+            z-index: 1000;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.5s, bottom 0.5s;
+        }
+        #notification-toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 50px;
+        }
+        /* Cursor pointer for clickable elements */
+        .cursor-pointer {
+            cursor: pointer;
+        }
+        /* Product Card specific styling for vertical layout */
+        .product-list-card {
+            display0: flex;
+            flex-direction: column;
+            /* For desktop, constrain width slightly for better readability */
+            max-width: 800px; 
+            margin: 0 auto;
+        }
+        @media (min-width: 768px) {
+            .product-list-card {
+                flex-direction: row; /* On tablet/desktop, align image and details horizontally */
+            }
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- شريط التنقل (Header) -->
+    <header class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <!-- الشعار / اسم الشركة -->
+            <div class="flex items-center space-x-2 cursor-pointer" onclick="showHomePage()">
+                <!-- أيقونة خطاف صيد (Fish Hook) -->
+                <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                <span class="text-2xl font-black text-primary">SCOLIO</span>
+            </div>
+            <!-- قائمة التنقل + سلة المشتريات -->
+            <nav class="flex items-center space-x-6 space-x-reverse text-lg font-medium">
+                <!-- الروابط -->
+                <a href="#" onclick="showHomePage()" class="hidden md:block hover:text-secondary transition duration-150">الرئيسية</a>
+                <a href="#products" onclick="showHomePage()" class="hidden md:block hover:text-secondary transition duration-150">المنتجات</a>
+                <a href="#order" onclick="showHomePage()" class="hidden md:block hover:text-secondary transition duration-150">اطلب الآن</a>
+                
+                <!-- أيقونة سلة المشتريات -->
+                <button onclick="openCartModal()" class="relative p-2 rounded-full hover:bg-gray-100 transition duration-150">
+                    <svg class="w-7 h-7 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    <span id="cart-count" class="absolute top-0 right-0 bg-red-600 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full transform translate-x-1/2 -translate-y-1/2">0</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- الصفحة الرئيسية (مجمعة في div واحد) -->
+    <div id="home-page">
+        <!-- قسم البطل (Hero Section) -->
+        <section class="bg-primary text-white py-16 md:py-32 relative overflow-hidden" 
+                 style="background-image: linear-gradient(to bottom, rgba(14, 27, 45, 0.75), rgba(14, 116, 144, 0.65)), url('https://images.unsplash.com/photo-1544287848-89c05c31751c?q=80&w=1920&auto=format&fit=crop'); background-size: cover; background-position: center;">
+            <div class="container mx-auto px-4 text-center relative z-10">
+                <h1 class="text-3xl md:text-6xl font-extrabold mb-6 leading-snug drop-shadow-lg">
+                    <span class="text-white"> معدات الصيد الاحترافية </span> <br>
+                    <span class="text-secondary drop-shadow-md">بين يديك </span>
+                </h1>
+                <p class="text-lg md:text-2xl mb-10 max-w-3xl mx-auto text-gray-100 drop-shadow-md">
+                    أفضل القصبات، البكرات، والطعوم الأصلية لتجربة صيد لا تُنسى.
+                </p>
+                <a href="#featured" class="inline-block bg-secondary text-white border-2 border-secondary font-bold text-xl py-3 px-10 rounded-full cta-button hover:bg-transparent hover:text-secondary transition-all">
+                    تسوق الآن واكتشف مجموعتنا
+                </a>
+            </div>
+        </section>
+
+        <!-- قسم فئات المنتجات (Categories) -->
+        <section id="products" class="py-16 md:py-24 bg-white">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl md:text-5xl font-extrabold text-center mb-12 text-primary">
+                    اكتشف فئات المنتجات
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- بطاقة الفئة 1: قصبات وبكرات -->
+                    <div onclick="showCategoryPage('rods')" class="cursor-pointer bg-gray-50 p-6 rounded-xl shadow-lg hover:shadow-xl hover:bg-gray-100 transition duration-300 text-center border-t-4 border-secondary group">
+                        <div class="h-40 overflow-hidden rounded-lg mb-4">
+                            <!-- تم إصلاح الصورة هنا لتظهر صورة افتراضية -->
+                            <img src="https://placehold.co/600x400/0e7490/ffffff?text=قصبات+وبكرات"  alt="قصبات وبكرات"   class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        </div>
+                        <h3 class="text-xl font-bold mb-3 text-primary">قصبات وبكرات</h3>
+                        <p class="text-gray-600">أحدث موديلات القصبات والبكرات لجميع أنواع الصيد. <span class="text-secondary font-bold text-sm block mt-2">اضغط للتصفح &larr;</span></p>
+                    </div>
+                    <!-- بطاقة الفئة 2: طُعم صناعي وطبيعي -->
+                    <div onclick="showCategoryPage('lures')" class="cursor-pointer bg-gray-50 p-6 rounded-xl shadow-lg hover:shadow-xl hover:bg-gray-100 transition duration-300 text-center border-t-4 border-secondary group">
+                        <div class="h-40 overflow-hidden rounded-lg mb-4">
+                             <!-- تم إصلاح الصورة هنا لتظهر صورة افتراضية -->
+                            <img src="https://placehold.co/600x400/f97316/ffffff?text=طعم+صناعي+وطبيعي" alt="طُعم صناعي وطبيعي" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        </div>
+                        <h3 class="text-xl font-bold mb-3 text-primary">طُعم صناعي وطبيعي</h3>
+                        <p class="text-gray-600">تشكيلة واسعة من الطُعم الصناعي الفعّال والطُعم الطبيعي. <span class="text-secondary font-bold text-sm block mt-2">اضغط للتصفح &larr;</span></p>
+                    </div>
+                    <!-- بطاقة الفئة 3: مستلزمات وملحقات -->
+                    <div onclick="showCategoryPage('accessories')" class="cursor-pointer bg-gray-50 p-6 rounded-xl shadow-lg hover:shadow-xl hover:bg-gray-100 transition duration-300 text-center border-t-4 border-secondary group">
+                        <div class="h-40 overflow-hidden rounded-lg mb-4">
+                             <!-- تم إصلاح الصورة هنا لتظهر صورة افتراضية -->
+                            <img src="https://placehold.co/600x400/0e7490/ffffff?text=مستلزمات+صيد" alt="مستلزمات وملحقات" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        </div>
+                        <h3 class="text-xl font-bold mb-3 text-primary">مستلزمات وملحقات</h3>
+                        <p class="text-gray-600">صناديق التخزين، الكماشات، الخيوط، والملابس الواقية. <span class="text-secondary font-bold text-sm block mt-2">اضغط للتصفح &larr;</span></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- قسم المنتجات المميزة (Featured Products) -->
+        <section id="featured" class="py-16 md:py-24 bg-gray-100">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl md:text-5xl font-extrabold text-center mb-12 text-primary">
+                    الأكثر مبيعاً هذا الأسبوع
+                </h2>
+                <!-- المنتجات معروضة عمودياً -->
+                <div class="space-y-6" id="featured-products-list">
+                    <!-- سيتم تعبئة المنتجات المميزة هنا بواسطة JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- قسم لماذا نحن (Why Choose Us) -->
+        <section id="whyus" class="py-16 md:py-24 bg-white">
+            <div class="container mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="order-2 lg:order-1">
+                    <h2 class="text-3xl md:text-5xl font-extrabold mb-6 text-primary">
+                        لماذا يختارنا الصيادون؟
+                    </h2>
+                    <ul class="space-y-4 text-gray-700">
+                        <li class="flex items-start"><svg class="w-6 h-6 text-secondary flex-shrink-0 mt-1 mr-3 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>ضمان جودة عالية.</li>
+                        <li class="flex items-start"><svg class="w-6 h-6 text-secondary flex-shrink-0 mt-1 mr-3 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>شحن سريع ومجاني للطلبات الكبيرة.</li>
+                        <li class="flex items-start"><svg class="w-6 h-6 text-secondary flex-shrink-0 mt-1 mr-3 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>دعم احترافي.</li>
+                    </ul>
+                </div>
+                <div class="order-1 lg:order-2">
+                    <!-- Placeholder image: صياد سعيد -->
+                    <img src="https://placehold.co/600x400/f97316/ffffff?text=صياد+سعيد" alt="صياد سعيد" class="rounded-xl shadow-2xl border-4 border-secondary w-full object-cover">
+                </div>
+            </div>
+        </section>
+    </div> <!-- نهاية home-page -->
+
+    <!-- صفحة الفئات (مخفية افتراضياً) -->
+    <div id="category-page" class="hidden min-h-screen py-10 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <!-- رأس الصفحة وزر العودة -->
+            <div class="flex items-center justify-between mb-8">
+                <h2 class="text-3xl md:text-4xl font-extrabold text-primary" id="category-title">قصبات وبكرات</h2>
+                <button onclick="showHomePage()" class="flex items-center text-secondary font-bold hover:text-orange-700 transition">
+                    <svg class="w-6 h-6 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    عودة للرئيسية
+                </button>
+            </div>
+            
+            <!-- قائمة منتجات الفئة -->
+            <div class="space-y-6" id="category-products-list">
+                <!-- سيتم تعبئة المنتجات هنا بواسطة JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- قسم الطلب المسبق (مشترك بين الصفحات) -->
+    <section id="order" class="py-16 md:py-24 bg-primary text-white">
+        <div class="container mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <!-- نموذج الطلب -->
+            <div class="p-8 bg-white text-gray-800 rounded-xl shadow-2xl">
+                <h2 class="text-3xl font-bold mb-6 text-primary">أرسل طلبك المسبق عبر واتساب</h2>
+                <form id="order-form" onsubmit="event.preventDefault(); submitOrder(this);" class="space-y-4">
+                    <div id="cart-order-status" class="p-3 mb-4 bg-red-100 border-r-4 border-red-500 text-red-700 rounded-lg text-sm font-medium">
+                        الرجاء إضافة منتجات إلى السلة أولاً.
+                    </div>
+                    <div>
+                        <label for="order-name" class="block text-sm font-medium text-gray-700">الاسم الكامل</label>
+                        <input type="text" id="order-name" name="name" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-secondary focus:border-secondary transition duration-150" placeholder="أدخل اسمك">
+                    </div>
+                    <div>
+                        <label for="order-phone" class="block text-sm font-medium text-gray-700">رقم الهاتف (للتواصل)</label>
+                        <input type="tel" id="order-phone" name="phone" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-secondary focus:border-secondary transition duration-150" placeholder=" 09XXXXXXXX" pattern="[0-9]{9,15}">
+                    </div>
+                    <div>
+                        <label for="order-location" class="block text-sm font-medium text-gray-700">الموقع/المدينة</label>
+                        <input type="text" id="order-location" name="location" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-secondary focus:border-secondary transition duration-150" placeholder="الموقع     ">
+                    </div>
+                    
+                    <button type="submit" id="submit-order-btn" class="cta-button w-full bg-secondary text-primary font-bold py-3 rounded-lg text-lg hover:bg-orange-400 transition duration-300" disabled>
+                        إرسال الطلب عبر واتساب
+                    </button>
+                    <!-- رسالة النجاح المخفية (تستخدم فقط في حالة عدم وجود طلب) -->
+                    <div id="success-message" class="hidden mt-4 p-3 bg-green-100 border-r-4 border-green-500 text-green-700 rounded-lg text-sm font-medium">
+                        تم تجهيز رسالتك! سيتم فتح تطبيق واتساب.
+                    </div>
+                </form>
+            </div>
+
+            <!-- معلومات الاتصال -->
+            <div class="flex flex-col justify-center space-y-8">
+                <h3 class="text-2xl font-bold">معلومات الاتصال المباشر</h3>
+                <div class="flex items-center space-x-4 space-x-reverse">
+                    <svg class="w-8 h-8 text-secondary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    <div>
+                        <p class="font-bold text-xl">موقع المتجر</p>
+                        <p class="opacity-80">ليبيا طرابلس         </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- تذييل الصفحة (Footer) -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-4 text-center text-sm md:flex md:justify-between md:items-center">
+            <p>&copy; 2025 صنارة لمعدات الصيد. جميع الحقوق محفوظة </p>
+            <div class="mt-4 md:mt-0 space-x-4 space-x-reverse">
+                <a href="#" class="hover:text-secondary transition duration-150">سياسة الخصوصية</a>
+                <a href="#" class="hover:text-secondary transition duration-150">شروط الاستخدام</a>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- زر واتساب العائم -->
+    <a href="https://wa.me/+2180920094089" target="_blank" class="whatsapp-float" title="تواصل معنا عبر واتساب">
+        <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12.031 2.25c-5.385 0-9.75 4.365-9.75 9.75 0 1.956.592 3.766 1.606 5.29l-1.688 6.166 6.304-1.651c1.474.79 3.136 1.258 4.78 1.258h.008c5.385 0 9.75-4.365 9.75-9.75s-4.365-9.75-9.75-9.75zm3.623 13.928c-.147.258-.878.675-1.259.693-.362.018-.748.028-1.134.028-.737 0-1.85-.296-2.502-1.096-.653-.8-.936-2.007-.936-3.132 0-1.047.564-1.748.775-1.959.212-.21.46-.37.747-.37.288 0 .43.018.665.578.235.578.807 2.053.882 2.213.076.16.126.37.03.567-.098.196-.147.296-.288.455-.14.16-.27.27-.41.43-.14.16-.296.34-.147.567.147.228.665.922 1.492 1.68.826.757 1.626 1.018 1.874 1.144.248.125.37.098.53.07.16-.03.518-.18.882-.44.362-.258.6-.53.775-.788.174-.258.33-.213.564-.097.235.115 1.498.71 1.748.835.25.125.43.18.53.28.098.098.098.608-.196 1.134z"/>
+        </svg>
+    </a>
+
+    <!-- مودال سلة المشتريات (Cart Modal) -->
+    <div id="cart-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 z-50 transition-opacity duration-300">
+        <div class="relative h-full w-full max-w-lg mx-auto pointer-events-none">
+            <!-- محتوى السلة (يظهر من اليمين في RTL) -->
+            <div class="absolute top-0 right-0 h-full w-full sm:w-96 bg-white shadow-2xl pointer-events-auto flex flex-col rounded-l-xl">
+                <div class="p-5 border-b flex justify-between items-center bg-gray-50">
+                    <h3 class="text-2xl font-bold text-primary">سلة المشتريات (<span id="modal-cart-count">0</span>)</h3>
+                    <button onclick="closeCartModal()" class="text-gray-500 hover:text-gray-800 transition">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+
+                <!-- قائمة المنتجات في السلة -->
+                <div id="cart-items-list" class="flex-grow p-5 overflow-y-auto space-y-4">
+                    <!-- يتم تحميل العناصر هنا بواسطة JavaScript -->
+                </div>
+
+                <!-- الإجمالي والدفع -->
+                <div class="p-5 border-t">
+                    <div class="flex justify-between items-center text-xl font-bold mb-4">
+                        <span>الإجمالي:</span>
+                        <span id="cart-total" class="text-secondary">0 دينار</span>
+                    </div>
+                    <a href="#order" onclick="closeCartModal()" class="cta-button w-full text-center block bg-primary text-white font-bold py-3 rounded-lg text-lg hover:bg-primary-dark transition duration-300">
+                        استكمال الطلب (واتساب)
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="notification-toast"></div>
+
+    <!-- JavaScript للتحكم في السلة والطلبات والمخزون والتنقل -->
+    <script>
+        // رقم الواتساب لـ "صنارة"
+        const WHATSAPP_NUMBER = "+2180920094089";
+        
+        // =========================================================================
+        // ===================== منطقة تعديل المنتجات ===============================
+        // =========================================================================
+        // لتغيير السعر: عدل الرقم بجانب كلمة "price"
+        // لتغيير الصورة: ضع رابط الصورة الجديد داخل علامات التنصيص بجانب كلمة "img"
+        // لتغيير الوصف: عدل النص داخل علامات التنصيص بجانب كلمة "desc"
+        // لتغيير المخزون: عدل الرقم بجانب كلمة "stock"
+        // =========================================================================
+        
+        const products = {
+            'prod-1': { 
+                name: 'قصبة صيد سمك من شركة ايكودا', 
+                price: 390,           // <--- السعر هنا (بالدينار)
+                unit: 'دينار', 
+                img: 'photo_2025-12-13_20-48-35.jpg', // <--- رابط الصورة هنا
+                desc: 'قصبة صيد من ايكودا مصنوعة من الياف الكربون تتميز بالمتانة والخفة تحتوي على عشرة حلقات من افضل الشركات شركة فوجي.',
+                optionsData: [ 
+                    { name: 'طول 2.7m ', stock: 3 },
+                ]
+            }, 
+            'prod-2': { 
+                name: 'مجموعة طعم صناعي (10 قطع)', 
+                price: 120,           // <--- السعر هنا (بالدينار)
+                unit: 'دينار', 
+                img: 'photo_2025-12-13_22-36-21.jpg', // <--- رابط الصورة هنا
+                 desc: '     قصبه من الياف كربون من شركة Diàomí بوزن خفيف جدا ومقبض مريح.',
+
+
+                optionsData: [
+                    { name: ' 3.0m وزن الرمي 18/60 H', stock: 5 },
+                    { name: '  3.0m وزن الرمي 15/50 MH', stock: 4 },
+                  
+                ]
+            }, 
+            'prod-3': { 
+                name: 'حقيبة تخزين مقاومة للماء', 
+                price: 210,           // <--- السعر هنا (بالدينار)
+                unit: 'دينار', 
+                img: 'https://placehold.co/400x300/0e7490/ffffff?text=حقيبة+تخزين', // <--- رابط الصورة هنا
+                desc: 'مقاومة للماء والصدمات، لتحفظ أدواتك بأمان.',
+                optionsData: [
+                    { name: 'حجم صغير', stock: 3 },
+                    { name: 'حجم وسط', stock: 3 },
+                    { name: 'حجم كبير', stock: 2 }
+                ]
+            }, 
+            'prod-4': { 
+                name: 'قصبة كربون خفيفة الوزن', 
+                price: 380,           // <--- السعر هنا (بالدينار)
+                unit: 'دينار', 
+                img: 'https://placehold.co/400x300/f97316/ffffff?text=قصبة+كربون', // <--- رابط الصورة هنا
+                desc: 'خفيفة الوزن، أداء احترافي، مرونة عالية.',
+                optionsData: [
+                    { name: '3.6 متر', stock: 1 },
+                    { name: '4.5 متر', stock: 1 },
+                    { name: '5.4 متر', stock: 1 }
+                ]
+            },
+            
+            // منتجات صفحة القصبات والبكرات
+            'rod-special-1': { 
+                name: 'قصبة شاطئية 4 متر', 
+                price: 250,           // <--- السعر هنا (بالدينار)
+                unit: 'دينار', 
+                img: 'photo_2025-12-13_22-36-21.jpg', 
+                desc: ' قصبه من الياف كربون من شركة Diàomí بوزن خفيف جدا ومقبض مريح.',
+                optionsData: [
+                     { name: ' 3.0m وزن الرمي 18/60 H', stock: 5 },
+                    { name: '  3.0m وزن الرمي 15/50 MH', stock: 4 },
+                  
+                ] 
+            },
+            'rod-special-2': { 
+                name: 'بكرة شيمانو أولتيجرا', 
+                price: 850,           // <--- السعر هنا (بالدينار)
+                unit: 'دينار', 
+                img: 'photo_2025-12-14_22-33-53.jpg', 
+                desc: 'أداء ياباني فائق النعومة والقوة، مقاومة للصدأ.',
+                optionsData: [
+                    { name: 'موديل 5500', stock: 1 },
+                    { name: 'موديل 14000', stock: 1 }
+                ]
+            },
+            'rod-special-3': { 
+                name: 'طقم قصبة وبكرة (كومبو)', 
+                price: 550,           // <--- السعر هنا (بالدينار)
+                unit: 'دينار', 
+                img: 'photo_2025-12-14_22-38-06.jpg', 
+                desc: 'طقم متكامل للمبتدئين والمحترفين، سهل الاستخدام.',
+                optionsData: [
+                    { name: 'خيط نايلون', stock: 3 },
+                    { name: 'خيط حرير', stock: 2 }
+                ]
+            },
+            'rod-special-4': { 
+                name: 'قصبة قارب (Boat Rod)', 
+                price: 400,           // <--- السعر هنا (بالدينار)
+                unit: 'دينار', 
+                img: 'https://placehold.co/400x300/f97316/ffffff?text=قصبة+قارب', 
+                desc: 'قوية جداً لمقاومة الأسماك الكبيرة في العمق مع قوة رفع ممتازة.',
+                optionsData: [
+                    { name: '1.8 متر', stock: 2 },
+                    { name: '2.1 متر', stock: 2 }
+                ]
+            },
+
+            // منتجات صفحة الطعم (جديد)
+            'lure-1': { 
+                name: 'طقم طُعم رابالا (Minnow)', 
+                price: 85,            // <--- السعر هنا (بالدينار)
+                unit: 'دينار', 
+                img: 'https://placehold.co/400x300/0e7490/ffffff?text=طقم+رابالا', 
+                desc: 'حركة سباحة واقعية تجذب الأسماك المفترسة، مثالي للماء العذب والمالح.',
+                optionsData: [
+                    { name: 'لون أحمر', stock: 5 },
+                    { name: 'لون أزرق', stock: 5 },
+                    { name: 'لون فضي', stock: 5 }
+                ]
+            },
+            'lure-2': { 
+                name: 'طُعم جيغ (Jig) 60g', 
+                price: 25,            // <--- السعر هنا (بالدينار)
+                unit: 'دينار', 
+                img: 'https://placehold.co/400x300/f97316/ffffff?text=طُعم+جيغ', 
+                desc: 'ممتاز للصيد العمودي (Jigging)، مغلف بطبقة مقاومة للتآكل.',
+                optionsData: [
+                    { name: '40 جرام', stock: 10 },
+                    { name: '60 جرام', stock: 10 },
+                    { name: '80 جرام', stock: 10 }
+                ]
+            },
+            'lure-3': { 
+                name: 'طُعم سيليكون (Soft Bait)', 
+                price: 45,            // <--- السعر هنا (بالدينار)
+                unit: 'دينار', 
+                img: 'https://placehold.co/400x300/0e7490/ffffff?text=طُعم+سيليكون', 
+                desc: 'مرونة عالية وألوان زاهية، يحاكي حركة الديدان والقشريات.',
+                optionsData: [
+                    { name: 'عبوة 5 قطع', stock: 10 },
+                    { name: 'عبوة 10 قطع', stock: 10 }
+                ]
+            },
+
+            // منتجات صفحة المستلزمات (بدون خيارات - يستخدم 'stock' بسيط)
+            'acc-1': { 
+                name: 'زرادية صيد متعددة المهام', 
+                price: 65,            // <--- السعر هنا (بالدينار)
+                unit: 'دينار', 
+                stock: 10, // مخزون بسيط للمنتجات التي لا تحتاج خيارات
+                img: 'https://placehold.co/400x300/f97316/ffffff?text=زرادية+صيد', 
+                desc: 'لفك الخطاف وقطع الخيوط بسهولة، مصنوعة من الفولاذ المقاوم للصدأ.',
+                optionsData: null 
+            },
+            'acc-2': { 
+                name: 'خيط حرير (Braid) 300m', 
+                price: 120,           // <--- السعر هنا (بالدينار)
+                unit: 'دينار', 
+                img: 'https://placehold.co/400x300/0e7490/ffffff?text=خيط+حرير', 
+                desc: 'خيط قوي جداً ومقاوم للاحتكاك، قوة شد فائقة.',
+                optionsData: [
+                    { name: '0.20 مم', stock: 3 },
+                    { name: '0.30 مم', stock: 3 },
+                    { name: '0.40 مم', stock: 2 }
+                ]
+            },
+            'acc-3': { 
+                name: 'قفازات صيد احترافية', 
+                price: 55,            // <--- السعر هنا (بالدينار)
+                unit: 'دينار', 
+                img: 'https://placehold.co/400x300/f97316/ffffff?text=قفازات+صيد', 
+                desc: 'حماية لليدين وتحكم أفضل في القصبة، سريعة الجفاف.',
+                optionsData: [
+                    { name: 'M', stock: 10 },
+                    { name: 'L', stock: 10 },
+                    { name: 'XL', stock: 5 }
+                ]
+            }
+        };
+
+        // =========================================================================
+        // ==================== نهاية منطقة تعديل المنتجات ==========================
+        // =========================================================================
+
+        // قوائم المنتجات لكل فئة
+        const featuredProductIds = ['prod-1', 'prod-2', 'prod-3', 'prod-4'];
+        const rodCategoryIds = ['prod-1', 'prod-4', 'rod-special-1', 'rod-special-2', 'rod-special-3', 'rod-special-4'];
+        const lureCategoryIds = ['prod-2', 'lure-1', 'lure-2', 'lure-3'];
+        const accessoryCategoryIds = ['prod-3', 'acc-1', 'acc-2', 'acc-3'];
+
+        let cart = []; 
+
+        function getCartQuantity(productId, optionName = null) {
+            if (optionName) {
+                // يحسب الكمية المضافة للسلة من خيار محدد
+                return cart.filter(item => item.productId === productId && item.option === optionName)
+                           .reduce((sum, item) => sum + item.quantity, 0);
+            } else {
+                // يحسب إجمالي الكمية من المنتج بالكامل (للمنتجات بدون خيارات)
+                 return cart.filter(item => item.productId === productId).reduce((sum, item) => sum + item.quantity, 0);
+            }
+        }
+
+        // --- دوال التنقل بين الصفحات ---
+        
+        function showHomePage() {
+            document.getElementById('home-page').classList.remove('hidden');
+            document.getElementById('category-page').classList.add('hidden');
+            window.scrollTo(0, 0);
+            renderFeaturedProducts(featuredProductIds);
+        }
+
+        function showCategoryPage(category) {
+            document.getElementById('home-page').classList.add('hidden');
+            document.getElementById('category-page').classList.remove('hidden');
+            window.scrollTo(0, 0);
+
+            let title = '';
+            let ids = [];
+
+            if (category === 'rods') {
+                title = 'قصبات وبكرات';
+                ids = rodCategoryIds;
+            } else if (category === 'lures') {
+                title = 'طُعم صناعي وطبيعي';
+                ids = lureCategoryIds;
+            } else if (category === 'accessories') {
+                title = 'مستلزمات وملحقات';
+                ids = accessoryCategoryIds;
+            }
+
+            document.getElementById('category-title').textContent = title;
+            renderCategoryProducts(ids);
+        }
+
+        // دالة مساعدة لإنشاء بطاقة المنتج
+        function createProductCardHTML(id) {
+            const product = products[id];
+            if (!product) return '';
+            
+            // استخدام رابط الصورة من بيانات المنتج
+            const imgSrc = product.img || `https://placehold.co/400x300/cccccc/333333?text=N/A`;
+            const desc = product.desc || 'جودة عالية وأداء ممتاز.';
+
+            let controlsHTML = '';
+            
+            const hasOptions = product.optionsData && product.optionsData.length > 0;
+            let isInitiallyAvailable = true;
+            
+            // تحديد حالة التوفر الأولية لقائمة الكمية (بناءً على الخيار الأول أو المخزون البسيط)
+            if (hasOptions) {
+                const firstOption = product.optionsData[0];
+                const remaining = firstOption.stock - getCartQuantity(id, firstOption.name);
+                isInitiallyAvailable = remaining > 0;
+            } else if (product.stock !== undefined) {
+                isInitiallyAvailable = (product.stock - getCartQuantity(id)) > 0;
+            }
+            
+            let qtyOptions = '<option value="1">1</option>';
+            if (!isInitiallyAvailable) {
+                qtyOptions = '<option value="0">0</option>';
+            }
+            
+            const qtySelectHTML = `
+                <select id="qty-${id}" ${!isInitiallyAvailable ? 'disabled' : ''} class="block w-1/3 border-gray-300 rounded-md shadow-sm focus:border-secondary focus:ring focus:ring-secondary focus:ring-opacity-50 p-2 border text-center font-bold">
+                    ${qtyOptions}
+                </select>
+            `;
+
+            if (hasOptions) {
+                // بناء خيارات المقاسات مع المخزون بجانب كل مقاس
+                const optionElements = product.optionsData.map(option => {
+                    // المخزون المتبقي حاليًا (0 لأن السلة فارغة عند الإنشاء)
+                    const remainingStock = option.stock; 
+                    const stockText = remainingStock > 0 
+                        ? ` (متوفر: ${remainingStock} قطعة)` 
+                        : ` (نفذت الكمية)`;
+                    const disabledAttr = remainingStock <= 0 ? 'disabled' : '';
+                    return `<option value="${option.name}" data-stock="${remainingStock}" ${disabledAttr}>${option.name}${stockText}</option>`;
+                }).join('');
+
+                controlsHTML = `
+                <div class="mt-4">
+                    <div class="flex justify-between items-baseline mb-1">
+                        <label class="block text-sm font-medium text-gray-700">اختر المقاس والعدد:</label>
+                    </div>
+                    <div class="flex space-x-2 space-x-reverse">
+                        <select id="option-${id}" onchange="updateQtyOptions('${id}')" class="block w-2/3 border-gray-300 rounded-md shadow-sm focus:border-secondary focus:ring focus:ring-secondary focus:ring-opacity-50 p-2 border">
+                            ${optionElements}
+                        </select>
+                        ${qtySelectHTML}
+                    </div>
+                </div>
+                `;
+            } else {
+                // منتج بدون خيارات
+                const remainingStock = product.stock;
+                const stockText = remainingStock > 0 
+                        ? ` (متوفر: ${remainingStock} قطعة)` 
+                        : ` (نفذت الكمية)`;
+                
+                controlsHTML = `
+                <div class="mt-4">
+                    <div class="flex justify-between items-baseline mb-1">
+                        <label class="block text-sm font-medium text-gray-700">عدد القطع: ${stockText}</label>
+                    </div>
+                    <div class="flex">
+                         ${qtySelectHTML.replace('w-1/3', 'w-full')}
+                    </div>
+                </div>
+                `;
+            }
+
+            const cardHTML = `
+            <div class="product-list-card bg-white rounded-xl shadow-lg overflow-hidden transition duration-300 hover:shadow-xl border border-gray-100" data-product-id="${id}">
+                <!-- قسم الصورة (متجاوب) -->
+                <div class="md:w-1/3 w-full md:p-4">
+                    <img src="${imgSrc}" alt="${product.name}" class="w-full h-48 md:h-full object-cover rounded-t-xl md:rounded-xl md:rounded-l-none">
+                </div>
+                
+                <!-- قسم التفاصيل والتحكم (متجاوب) -->
+                <div class="md:w-2/3 w-full p-5 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-2xl font-bold text-primary mb-2">${product.name}</h3>
+                        <p class="text-md text-gray-600 mb-2">${desc}</p>
+                        ${controlsHTML}
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mt-auto pt-4 border-t border-gray-100 mt-4">
+                        <!-- معلومات السعر -->
+                        <div class="mb-4 sm:mb-0">
+                            <span class="block text-3xl font-extrabold text-secondary">${product.price} دينار</span>
+                        </div>
+                        
+                        <!-- زر الإضافة للسلة -->
+                        <button id="btn-${id}" onclick="addToCart('${id}')" class="w-full sm:w-auto ${!isInitiallyAvailable ? 'bg-gray-400 cursor-not-allowed' : 'bg-secondary hover:bg-orange-400'} text-primary font-bold py-3 px-8 rounded-lg text-lg transition duration-300 shadow-md" ${!isInitiallyAvailable ? 'disabled' : ''}>
+                            أضف إلى السلة
+                        </button>
+                    </div>
+                </div>
+            </div>
+            `;
+            return cardHTML;
+        }
+
+        function renderFeaturedProducts(ids) {
+            const list = document.getElementById('featured-products-list');
+            list.innerHTML = '';
+            
+            ids.forEach(id => {
+                list.innerHTML += createProductCardHTML(id);
+            });
+            
+            // تحديث واجهة المستخدم بعد إضافة العناصر لضبط المخزون وقوائم الكمية
+            updateCartUI();
+        }
+
+        function renderCategoryProducts(ids) {
+            const list = document.getElementById('category-products-list');
+            list.innerHTML = ''; 
+            
+            ids.forEach(id => {
+                list.innerHTML += createProductCardHTML(id);
+            });
+            
+            // تحديث واجهة المستخدم بعد إضافة العناصر لضبط المخزون وقوائم الكمية
+            updateCartUI();
+        }
+
+        // --- دوال السلة والمخزون ---
+
+        function updateQtyOptions(productId) {
+            const product = products[productId];
+            const optionSelect = document.getElementById(`option-${productId}`);
+            const qtySelect = document.getElementById(`qty-${productId}`);
+            const addButton = document.getElementById(`btn-${productId}`);
+
+            if (!product || !qtySelect || !addButton || !optionSelect) return;
+
+            // 1. الحصول على الخيار المحدد وقيمة المخزون المتبقي له
+            const selectedOptionElement = optionSelect.options[optionSelect.selectedIndex];
+            // نقرأ المخزون المتبقي من بيانات المنتج مباشرة ليكون دقيقاً بعد كل عملية سلة
+            const optionData = product.optionsData.find(opt => opt.name === selectedOptionElement.value);
+            
+            const remainingStock = optionData ? (optionData.stock - getCartQuantity(productId, optionData.name)) : 0;
+            
+            // 2. تحديد أقصى كمية يمكن طلبها (بحد أقصى 10)
+            const maxOptions = Math.min(remainingStock, 10);
+            
+            // 3. تحديث خيارات قائمة الكمية
+            let optionsHTML = '';
+            let isAvailable = remainingStock > 0;
+
+            if (isAvailable) {
+                qtySelect.disabled = false;
+                for (let i = 1; i <= maxOptions; i++) {
+                    optionsHTML += `<option value="${i}">${i}</option>`;
+                }
+                qtySelect.innerHTML = optionsHTML;
+                qtySelect.value = 1;
+                
+                addButton.disabled = false;
+                addButton.textContent = 'أضف إلى السلة';
+                addButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                addButton.classList.add('bg-secondary', 'hover:bg-orange-400');
+            } else {
+                // الخيار المحدد نفدت كميته
+                qtySelect.disabled = true;
+                qtySelect.innerHTML = '<option value="0">0</option>';
+                
+                addButton.disabled = true;
+                addButton.textContent = 'نفدت الكمية المحددة';
+                addButton.classList.add('bg-gray-400', 'cursor-not-allowed');
+                addButton.classList.remove('bg-secondary', 'hover:bg-orange-400');
+            }
+        }
+
+        function updateCartUI() {
+            const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const total = cart.reduce((sum, item) => sum + (item.quantity * products[item.productId].price), 0);
+            
+            document.getElementById('cart-count').textContent = count;
+            document.getElementById('modal-cart-count').textContent = count;
+            document.getElementById('cart-total').textContent = `${total} دينار`;
+            
+            const statusDiv = document.getElementById('cart-order-status');
+            const submitBtn = document.getElementById('submit-order-btn');
+
+            if (count > 0) {
+                statusDiv.classList.remove('bg-red-100', 'border-red-500', 'text-red-700');
+                statusDiv.classList.add('bg-green-100', 'border-green-500', 'text-green-700');
+                statusDiv.innerHTML = `<strong>تم إضافة ${count} منتجًا.</strong> يمكنك الآن إرسال الطلب.`;
+                submitBtn.disabled = false;
+            } else {
+                statusDiv.classList.remove('bg-green-100', 'border-green-500', 'text-green-700');
+                statusDiv.classList.add('bg-red-100', 'border-red-500', 'text-red-700');
+                statusDiv.innerHTML = 'الرجاء إضافة منتجات إلى السلة أولاً.';
+                submitBtn.disabled = true;
+            }
+
+            renderCartItems();
+            
+            // تحديث جميع بطاقات المنتجات على الشاشة
+            Object.keys(products).forEach(id => {
+                const product = products[id];
+                const optionSelect = document.getElementById(`option-${id}`);
+                const qtySelect = document.getElementById(`qty-${id}`);
+                const addButton = document.getElementById(`btn-${id}`);
+                
+                if (!product || !addButton) return;
+
+                if (product.optionsData) {
+                    // المنتج بخيارات (تحديث خيارات المقاس ثم قائمة الكمية)
+                    if (optionSelect) {
+                        const currentSelection = optionSelect.value;
+                        const productOptions = product.optionsData;
+                        
+                        // إعادة بناء خيارات المقاس لتحديث المخزون بجانبها
+                        const optionElements = productOptions.map(option => {
+                            const remainingStock = option.stock - getCartQuantity(id, option.name);
+                            const stockText = remainingStock > 0 
+                                ? ` (متوفر: ${remainingStock} قطعة)` 
+                                : ` (نفذت الكمية)`;
+                            const disabledAttr = remainingStock <= 0 ? 'disabled' : '';
+                            const isSelected = currentSelection === option.name ? 'selected' : '';
+                            
+                            return `<option value="${option.name}" data-stock="${remainingStock}" ${disabledAttr} ${isSelected}>${option.name}${stockText}</option>`;
+                        }).join('');
+                        
+                        optionSelect.innerHTML = optionElements;
+                        
+                        // استدعاء دالة تحديث قائمة الكمية بناءً على الخيار المحدد
+                        updateQtyOptions(id);
+                    }
+                
+                } else if (product.stock !== undefined) {
+                    // المنتج بدون خيارات (تحديث المخزون في النص وقائمة الكمية)
+                    const remainingStock = product.stock - getCartQuantity(id);
+                    const labelElement = qtySelect.parentElement.previousElementSibling.querySelector('label');
+
+                    // تحديث نص المخزون في الـ Label
+                    const stockText = remainingStock > 0 
+                        ? ` (متوفر: ${remainingStock} قطعة)` 
+                        : ` (نفذت الكمية)`;
+                    labelElement.innerHTML = `عدد القطع: ${stockText}`;
+                    
+                    // تحديث قائمة الكمية (Qty Select)
+                    const maxOptions = Math.min(remainingStock, 10);
+                    let optionsHTML = '';
+                    if (remainingStock > 0) {
+                        qtySelect.disabled = false;
+                        for (let i = 1; i <= maxOptions; i++) {
+                            optionsHTML += `<option value="${i}">${i}</option>`;
+                        }
+                        qtySelect.innerHTML = optionsHTML;
+                        qtySelect.value = 1;
+                        
+                        addButton.disabled = false;
+                        addButton.textContent = 'أضف إلى السلة';
+                        addButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                        addButton.classList.add('bg-secondary', 'hover:bg-orange-400');
+                    } else {
+                        qtySelect.disabled = true;
+                        qtySelect.innerHTML = '<option value="0">0</option>';
+                        
+                        addButton.disabled = true;
+                        addButton.textContent = 'نفدت الكمية';
+                        addButton.classList.add('bg-gray-400', 'cursor-not-allowed');
+                        addButton.classList.remove('bg-secondary', 'hover:bg-orange-400');
+                    }
+                }
+            });
+        }
+
+        function addToCart(productId) {
+            const product = products[productId];
+            
+            const qtySelect = document.getElementById(`qty-${productId}`);
+            const quantityToAdd = qtySelect ? parseInt(qtySelect.value) : 1;
+            
+            if (isNaN(quantityToAdd) || quantityToAdd <= 0) {
+                showNotification('الرجاء اختيار كمية صحيحة.', 'bg-red-500');
+                return;
+            }
+
+            // الحصول على الخيار المختار
+            let selectedOption = null;
+            const selectElement = document.getElementById(`option-${productId}`);
+            if (selectElement) {
+                selectedOption = selectElement.value;
+            }
+
+            // منطق التحقق من المخزون بناءً على الخيار
+            let remainingStock = 0;
+            const hasOptions = product.optionsData && product.optionsData.length > 0;
+            
+            if (hasOptions) {
+                const optionData = product.optionsData.find(opt => opt.name === selectedOption);
+                if (!optionData) return; 
+                
+                const inCartForOption = getCartQuantity(productId, selectedOption);
+                remainingStock = optionData.stock - inCartForOption;
+            } else {
+                const inCart = getCartQuantity(productId);
+                remainingStock = product.stock - inCart;
+            }
+
+            if (quantityToAdd > remainingStock) {
+                showNotification(`عذراً، الكمية المتوفرة المتبقية من هذا الخيار هي ${remainingStock} قطعة فقط.`, 'bg-red-500');
+                return;
+            }
+
+            // إضافة المنتج للسلة
+            const existingItem = cart.find(item => item.productId === productId && item.option === selectedOption);
+            
+            if (existingItem) {
+                existingItem.quantity += quantityToAdd;
+            } else {
+                cart.push({ productId: productId, option: selectedOption, quantity: quantityToAdd });
+            }
+            
+            updateCartUI();
+            
+            // إعادة تعيين القائمة إلى 1 بعد الإضافة
+            if (qtySelect) qtySelect.value = 1;
+
+            const optionText = selectedOption ? ` (${selectedOption})` : '';
+            showNotification(`تم إضافة ${quantityToAdd} × ${product.name}${optionText} إلى السلة!`);
+        }
+        
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+        }
+
+        // تغيير الكمية باستخدام index المصفوفة لأنه فريد لكل سطر في السلة
+        function changeQuantity(index, delta) {
+            const item = cart[index];
+            if (!item) return;
+
+            const product = products[item.productId];
+            
+            // تحديد المخزون المتاح للخيار المحدد
+            let maxStock = 0;
+            const hasOptions = product.optionsData && product.optionsData.length > 0;
+            
+            if (hasOptions) {
+                const optionData = product.optionsData.find(opt => opt.name === item.option);
+                maxStock = optionData ? optionData.stock : 0;
+            } else {
+                maxStock = product.stock;
+            }
+            
+            // إجمالي الكمية في السلة لنفس الخيار/المنتج
+            const totalInCartForThisOption = getCartQuantity(item.productId, item.option);
+            
+            if (delta > 0) {
+                // التحقق من أن الزيادة لا تتجاوز المخزون
+                if (totalInCartForThisOption + 1 <= maxStock) {
+                    item.quantity += 1;
+                } else {
+                    showNotification(`عذراً، الحد الأقصى المتوفر من ${product.name} هو ${maxStock} قطعة.`, 'bg-red-500');
+                    return;
+                }
+            } else if (delta < 0) {
+                item.quantity -= 1;
+            }
+
+            if (item.quantity <= 0) {
+                removeFromCart(index);
+            } else {
+                updateCartUI();
+            }
+        }
+
+        function renderCartItems() {
+            const list = document.getElementById('cart-items-list');
+            list.innerHTML = ''; 
+
+            if (cart.length === 0) {
+                list.innerHTML = '<p class="text-center text-gray-500 p-8">سلة المشتريات فارغة.</p>';
+                return;
+            }
+
+            cart.forEach((item, index) => {
+                const details = products[item.productId];
+                
+                // تحديد الحد الأقصى للكمية لهذا الخيار
+                let maxStock = 0;
+                let optionName = null;
+                if (details.optionsData) {
+                    const optionData = details.optionsData.find(opt => opt.name === item.option);
+                    if (optionData) {
+                        maxStock = optionData.stock;
+                        optionName = optionData.name;
+                    }
+                } else if (details.stock !== undefined) {
+                    maxStock = details.stock;
+                }
+
+                const totalInCartForThisOption = getCartQuantity(item.productId, optionName || null);
+                const canAddMore = totalInCartForThisOption < maxStock; 
+                
+                const optionDisplay = item.option ? `<span class="text-xs bg-gray-100 px-2 py-1 rounded text-gray-600 mt-1 inline-block">الخيار: ${item.option}</span>` : '';
+
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'flex justify-between items-center p-3 border rounded-lg bg-white shadow-sm';
+                itemDiv.innerHTML = `
+                    <div class="flex flex-col space-y-1">
+                        <p class="font-bold text-primary">${details.name}</p>
+                        ${optionDisplay}
+                        <p class="text-sm text-gray-600">${details.price} ${details.unit} / للوحدة</p>
+                    </div>
+                    <div class="flex items-center space-x-2 space-x-reverse">
+                        <button onclick="changeQuantity(${index}, 1)" class="text-white ${!canAddMore ? 'bg-gray-300 cursor-not-allowed' : 'bg-primary hover:bg-blue-700'} p-1 rounded-full w-6 h-6 flex items-center justify-center" ${!canAddMore ? 'disabled' : ''}>+</button>
+                        <span class="font-bold text-lg w-4 text-center">${item.quantity}</span>
+                        <button onclick="changeQuantity(${index}, -1)" class="text-white bg-red-500 hover:bg-red-700 p-1 rounded-full w-6 h-6 flex items-center justify-center">-</button>
+                    </div>
+                `;
+                list.appendChild(itemDiv);
+            });
+        }
+
+        function submitOrder(form) {
+            if (cart.length === 0) return;
+
+            const name = form.name.value;
+            const phone = form.phone.value;
+            const location = form.location.value;
+            
+            let message = `مرحباً صنارة، أود طلب المنتجات التالية:%0a`;
+            message += `---------------------------%0a`;
+            
+            let total = 0;
+            cart.forEach(item => {
+                const p = products[item.productId];
+                const subtotal = item.quantity * p.price;
+                total += subtotal;
+                const optionText = item.option ? ` [${item.option}]` : '';
+                message += `- ${p.name}${optionText} (${item.quantity} × ${p.price} دينار) = ${subtotal} دينار%0a`;
+                
+                // خصم الكمية من المخزون (بناءً على الخيار أو المخزون البسيط)
+                const product = products[item.productId];
+                if (product) {
+                    if (product.optionsData) {
+                        const optionToUpdate = product.optionsData.find(opt => opt.name === item.option);
+                        if (optionToUpdate) {
+                            optionToUpdate.stock -= item.quantity;
+                        }
+                    } else if (product.stock !== undefined) {
+                        product.stock -= item.quantity;
+                    }
+                }
+            });
+            
+            message += `---------------------------%0a`;
+            message += `*الإجمالي: ${total} دينار*%0a`;
+            message += `---------------------------%0a`;
+            message += `الاسم: ${name}%0a`;
+            message += `الجوال: ${phone}%0a`;
+            message += `الموقع: ${location}`;
+
+            const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
+            window.open(url, '_blank');
+
+            document.getElementById('success-message').classList.remove('hidden');
+            cart = [];
+            form.reset();
+            
+            updateCartUI();
+
+            showNotification("تم إرسال طلبك وخصم الكمية من المخزون! سنقوم بالتواصل معك قريباً.", "bg-green-600");
+        }
+
+        function showNotification(message, bgClass = 'bg-gray-800') {
+            const toast = document.getElementById('notification-toast');
+            toast.textContent = message;
+            // إزالة جميع الفئات المتعلقة باللون وإضافة الفئة المطلوبة
+            toast.className = ''; 
+            toast.classList.add('text-white', 'text-sm', 'font-medium', 'rounded-lg', 'shadow-lg');
+            toast.classList.add(bgClass);
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        function openCartModal() {
+            document.getElementById('cart-modal').classList.remove('hidden');
+        }
+        function closeCartModal() {
+            document.getElementById('cart-modal').classList.add('hidden');
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderFeaturedProducts(featuredProductIds);
+        });
+
+    </script>
+</body>
+</html>
