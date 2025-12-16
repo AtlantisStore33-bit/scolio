@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCOLIO - معدات صيد احترافية</title>
+    
+    <!-- مكتبة التنسيق (Tailwind CSS) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- الخط العربي (Cairo) -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #f3f4f6; /* لون خلفية هادئ */
+        }
+        /* ألوان الهوية البصرية */
+        .text-brand { color: #0891b2; } /* أزرق بحري */
+        .bg-brand { background-color: #0891b2; }
+        .bg-brand-dark { background-color: #155e75; }
+        .text-accent { color: #ea580c; } /* برتقالي حيوي */
+        .bg-accent { background-color: #ea580c; }
+        .border-accent { border-color: #ea580c; }
+
+        /* تأثيرات الانتقال */
+        .card-hover {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        /* زر الواتساب العائم */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 25px;
+            left: 25px;
+            background-color: #25d366;
+            color: white;
+            border-radius: 50%;
+            padding: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            z-index: 100;
+            transition: transform 0.3s;
+        }
+        .whatsapp-float:hover { transform: scale(1.1); }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- 1. شريط العنوان (Header) -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <!-- الشعار -->
+            <div class="flex items-center gap-2 cursor-pointer" onclick="showHomePage()">
+                <div class="bg-brand text-white p-2 rounded-lg">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
+                </div>
+                <span class="text-2xl font-black text-brand tracking-wider">SCOLIO</span>
+            </div>
+
+            <!-- أيقونة السلة -->
+            <button onclick="toggleCart()" class="relative p-2 text-gray-600 hover:text-brand transition">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                <span id="cart-counter" class="absolute -top-1 -right-1 bg-accent text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center transform scale-0 transition-transform duration-200">0</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- 2. المحتوى الرئيسي -->
+    <main class="container mx-auto px-4 py-6 max-w-3xl"> <!-- max-w-3xl يجعل المحتوى في عمود متوسط العرض -->
+
+        <!-- الصفحة الرئيسية -->
+        <div id="home-view">
+            <!-- بانر ترحيبي -->
+            <div class="bg-gradient-to-br from-cyan-800 to-cyan-600 rounded-2xl p-8 text-center text-white mb-8 shadow-lg relative overflow-hidden">
+                <div class="relative z-10">
+                    <h1 class="text-3xl md:text-5xl font-extrabold mb-4">SCOLIO</h1>
+                    <p class="text-lg opacity-90 mb-6">معدات صيد احترافية.. تجربة لا تُنسى</p>
+                    <a href="#featured-products" class="inline-block bg-accent text-white px-6 py-2 rounded-full font-bold hover:bg-orange-600 transition shadow-md">تسوق الآن</a>
+                </div>
+                <!-- زخرفة خلفية بسيطة -->
+                <svg class="absolute top-0 right-0 w-64 h-64 text-white opacity-5 transform translate-x-10 -translate-y-10" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5-9h10v2H7z"/></svg>
+            </div>
+
+            <!-- الأقسام (مرتبة تحت بعض) -->
+            <div class="space-y-6 mb-12">
+                <h2 class="text-2xl font-bold text-gray-800 border-r-4 border-brand pr-3">الأقسام</h2>
+                
+                <!-- قسم 1 -->
+                <div onclick="filterCategory('rods')" class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4 cursor-pointer card-hover hover:border-brand">
+                    <div class="w-20 h-20 bg-gray-100 rounded-lg flex-shrink-0 overflow-hidden">
+                        <img src="https://placehold.co/150x150/0891b2/ffffff?text=قصبات" alt="قصبات" class="w-full h-full object-cover">
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">قصبات وبكرات</h3>
+                        <p class="text-gray-500 text-sm">أفضل الماركات العالمية للقصبات</p>
+                    </div>
+                    <div class="mr-auto text-brand">
+                        <svg class="w-6 h-6 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </div>
+                </div>
+
+                <!-- قسم 2 -->
+                <div onclick="filterCategory('lures')" class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4 cursor-pointer card-hover hover:border-brand">
+                    <div class="w-20 h-20 bg-gray-100 rounded-lg flex-shrink-0 overflow-hidden">
+                        <img src="https://placehold.co/150x150/ea580c/ffffff?text=طعم" alt="طعوم" class="w-full h-full object-cover">
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">طُعم صناعي وطبيعي</h3>
+                        <p class="text-gray-500 text-sm">مجموعة متنوعة لجميع الأسماك</p>
+                    </div>
+                    <div class="mr-auto text-brand">
+                        <svg class="w-6 h-6 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </div>
+                </div>
+
+                <!-- قسم 3 -->
+                <div onclick="filterCategory('accessories')" class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4 cursor-pointer card-hover hover:border-brand">
+                    <div class="w-20 h-20 bg-gray-100 rounded-lg flex-shrink-0 overflow-hidden">
+                        <img src="https://placehold.co/150x150/333333/ffffff?text=مستلزمات" alt="مستلزمات" class="w-full h-full object-cover">
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">مستلزمات وملحقات</h3>
+                        <p class="text-gray-500 text-sm">حقائب، خيوط، وأدوات أخرى</p>
+                    </div>
+                    <div class="mr-auto text-brand">
+                        <svg class="w-6 h-6 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- المنتجات المميزة (مرتبة تحت بعض) -->
+            <div id="featured-products" class="space-y-8">
+                <h2 class="text-2xl font-bold text-gray-800 border-r-4 border-accent pr-3">أحدث المنتجات</h2>
+                
+                <!-- حاوية المنتجات -->
+                <div id="products-container" class="space-y-6">
+                    <!-- سيتم توليد المنتجات هنا بواسطة الجافاسكريبت -->
+                </div>
+            </div>
+        </div>
+
+        <!-- صفحة عرض فئة معينة -->
+        <div id="category-view" class="hidden">
+            <button onclick="showHomePage()" class="mb-6 flex items-center text-brand font-bold hover:underline">
+                <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                العودة للرئيسية
+            </button>
+            <h2 id="category-title" class="text-3xl font-black text-gray-800 mb-8">عنوان القسم</h2>
+            <div id="category-products-container" class="space-y-6">
+                <!-- منتجات القسم -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- تذييل الصفحة -->
+    <footer class="bg-gray-800 text-gray-300 py-8 mt-12 text-center">
+        <p class="font-bold text-xl text-white mb-2">SCOLIO</p>
+        <p>جميع الحقوق محفوظة &copy; 2025</p>
+    </footer>
+
+    <!-- سلة المشتريات (Modal) -->
+    <div id="cart-modal" class="fixed inset-0 z-[100] hidden">
+        <!-- الخلفية المظللة -->
+        <div class="absolute inset-0 bg-black bg-opacity-50 transition-opacity" onclick="toggleCart()"></div>
+        
+        <!-- محتوى السلة (يظهر من الأسفل في الجوال) -->
+        <div class="absolute bottom-0 md:top-0 md:left-0 md:bottom-0 md:right-auto w-full md:w-[400px] bg-white shadow-2xl flex flex-col h-[85vh] md:h-full rounded-t-2xl md:rounded-none transform transition-transform duration-300 translate-y-full md:translate-x-full" id="cart-panel">
+            
+            <div class="p-4 border-b flex justify-between items-center bg-gray-50 rounded-t-2xl md:rounded-none">
+                <h3 class="text-xl font-bold">سلة المشتريات</h3>
+                <button onclick="toggleCart()" class="text-gray-500 hover:text-red-500">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <div id="cart-items" class="flex-1 overflow-y-auto p-4 space-y-4">
+                <!-- المنتجات المضافة ستظهر هنا -->
+                <div class="text-center text-gray-400 mt-10">السلة فارغة حالياً</div>
+            </div>
+
+            <div class="p-4 border-t bg-gray-50">
+                <div class="flex justify-between items-center mb-4 text-lg font-bold">
+                    <span>الإجمالي:</span>
+                    <span id="cart-total" class="text-brand">0 د.ل</span>
+                </div>
+                
+                <!-- نموذج الطلب البسيط -->
+                <div class="space-y-3 mb-3">
+                    <input type="text" id="customer-name" placeholder="الاسم الكريم" class="w-full p-2 border rounded text-sm focus:outline-none focus:border-brand">
+                    <input type="text" id="customer-address" placeholder="العنوان (المدينة - الحي)" class="w-full p-2 border rounded text-sm focus:outline-none focus:border-brand">
+                </div>
+
+                <button onclick="sendOrderToWhatsapp()" class="w-full bg-green-500 text-white font-bold py-3 rounded-lg hover:bg-green-600 transition flex justify-center items-center gap-2">
+                    <span>إرسال الطلب واتساب</span>
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.151-.174.2-.297.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.017-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- زر واتساب العائم -->
+    <a href="https://wa.me/2180920094089" target="_blank" class="whatsapp-float">
+        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.151-.174.2-.297.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.017-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+    </a>
+
+    <!-- إشعار الإضافة (Toast) -->
+    <div id="toast" class="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-full shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none z-[110]">
+        تمت الإضافة للسلة بنجاح
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- ======================= كود الجافاسكريبت ======================== -->
+    <!-- ================================================================= -->
+    <script>
+        // =========================================================================
+        // 1. منطقة تعديل البيانات (عدل هنا فقط لتغيير المنتجات)
+        // =========================================================================
+        
+        // رقم الواتساب الخاص بالمتجر
+        const PHONE_NUMBER = "+2180920094089"; 
+
+        // قائمة المنتجات
+        // لتغيير الصورة، ضع الرابط بين علامات التنصيص '...'
+        // الفئات المتاحة: 'rods' (قصبات), 'lures' (طعم), 'accessories' (مستلزمات)
+        const products = [
+            // --- قصبات وبكرات ---
+            {
+                id: 1,
+                name: "قصبة ايكودا كربون",
+                price: 390,
+                category: "rods",
+                image: "images/xc.jpg", 
+                desc: "قصبة كاربون خفيفة جداً مع حلقات فوجي أصلية."
+            },
+            {
+                id: 2,
+                name: "بكرة شيمانو 5000",
+                price: 850,
+                category: "rods",
+                image: "https://placehold.co/400x300/155e75/ffffff?text=بكرة+شيمانو",
+                desc: "بكرة قوية للمحترفين مقاومة للماء المالح."
+            },
+            {
+                id: 3,
+                name: "قصبة Diàomí 3.0m",
+                price: 250,
+                category: "rods",
+                image: "https://placehold.co/400x300/0891b2/ffffff?text=قصبة+Diàomí",
+                desc: "وزن رمي 18/60، مقبض مريح جداً."
+            },
+
+            // --- طعوم ---
+            {
+                id: 4,
+                name: "طعم رابالا (طقم)",
+                price: 120,
+                category: "lures",
+                image: "https://placehold.co/400x300/ea580c/ffffff?text=طعم+رابالا",
+                desc: "مجموعة 10 قطع ألوان متنوعة."
+            },
+            {
+                id: 5,
+                name: "طعم جيغ 60 جرام",
+                price: 25,
+                category: "lures",
+                image: "https://placehold.co/400x300/ea580c/ffffff?text=جيغ+60g",
+                desc: "ممتاز للصيد العمودي."
+            },
+
+            // --- مستلزمات ---
+            {
+                id: 6,
+                name: "حقيبة عدة كاملة",
+                price: 210,
+                category: "accessories",
+                image: "https://placehold.co/400x300/333333/ffffff?text=حقيبة+عدة",
+                desc: "مقاومة للماء وتتسع لجميع المعدات."
+            },
+            {
+                id: 7,
+                name: "خيط حرير 300 متر",
+                price: 65,
+                category: "accessories",
+                image: "https://placehold.co/400x300/333333/ffffff?text=خيط+حرير",
+                desc: "قوة شد عالية، متعدد الألوان."
+            }
+        ];
+
+        // =========================================================================
+        // 2. المنطق البرمجي (لا تقم بالتعديل هنا إلا إذا كنت مبرمجاً)
+        // =========================================================================
+
+        let cart = [];
+
+        // تشغيل عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', () => {
+            renderProducts(products, 'products-container'); // عرض كل المنتجات في الصفحة الرئيسية
+        });
+
+        // دالة عرض المنتجات
+        function renderProducts(list, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            list.forEach(product => {
+                const card = `
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col md:flex-row card-hover">
+                        <!-- الصورة (تأخذ العرض الكامل في الجوال، وجانب اليسار في الكمبيوتر) -->
+                        <div class="md:w-1/3 h-48 md:h-auto relative">
+                            <img src="${product.image}" alt="${product.name}" class="absolute inset-0 w-full h-full object-cover">
+                        </div>
+                        
+                        <!-- التفاصيل -->
+                        <div class="p-5 flex flex-col justify-between flex-1">
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-1">${product.name}</h3>
+                                <p class="text-gray-500 text-sm mb-4 leading-relaxed">${product.desc}</p>
+                            </div>
+                            
+                            <div class="flex items-center justify-between mt-4 border-t pt-4 border-gray-50">
+                                <span class="text-2xl font-bold text-brand">${product.price} <span class="text-sm font-normal text-gray-400">د.ل</span></span>
+                                <button onclick="addToCart(${product.id})" class="bg-brand text-white px-6 py-2 rounded-lg font-bold hover:bg-cyan-700 transition shadow-sm flex items-center gap-2">
+                                    <span>أضف للسلة</span>
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += card;
+            });
+        }
+
+        // دالة تصفية المنتجات حسب الفئة
+        function filterCategory(category) {
+            // إخفاء الصفحة الرئيسية وإظهار صفحة الفئة
+            document.getElementById('home-view').classList.add('hidden');
+            document.getElementById('category-view').classList.remove('hidden');
+
+            // تغيير العنوان
+            const titles = {
+                'rods': 'قصبات وبكرات',
+                'lures': 'طُعم صناعي وطبيعي',
+                'accessories': 'مستلزمات وملحقات'
+            };
+            document.getElementById('category-title').textContent = titles[category];
+
+            // تصفية وعرض المنتجات
+            const filtered = products.filter(p => p.category === category);
+            renderProducts(filtered, 'category-products-container');
+            
+            // العودة لأعلى الصفحة
+            window.scrollTo(0,0);
+        }
+
+        function showHomePage() {
+            document.getElementById('home-view').classList.remove('hidden');
+            document.getElementById('category-view').classList.add('hidden');
+            window.scrollTo(0,0);
+        }
+
+        // --- وظائف السلة ---
+
+        function addToCart(id) {
+            const product = products.find(p => p.id === id);
+            const existing = cart.find(item => item.id === id);
+
+            if (existing) {
+                existing.qty++;
+            } else {
+                cart.push({ ...product, qty: 1 });
+            }
+
+            updateCartUI();
+            showToast();
+        }
+
+        function updateCartUI() {
+            const cartItemsContainer = document.getElementById('cart-items');
+            const counter = document.getElementById('cart-counter');
+            const totalEl = document.getElementById('cart-total');
+
+            // تحديث العداد
+            const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+            counter.innerText = totalQty;
+            if (totalQty > 0) counter.classList.remove('scale-0');
+
+            // تحديث القائمة
+            cartItemsContainer.innerHTML = '';
+            let totalPrice = 0;
+
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = '<div class="text-center text-gray-400 mt-10">السلة فارغة حالياً</div>';
+            } else {
+                cart.forEach((item, index) => {
+                    totalPrice += item.price * item.qty;
+                    cartItemsContainer.innerHTML += `
+                        <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-200">
+                            <div class="flex items-center gap-3">
+                                <img src="${item.image}" class="w-12 h-12 rounded object-cover border">
+                                <div>
+                                    <p class="font-bold text-sm text-gray-800">${item.name}</p>
+                                    <p class="text-xs text-gray-500">${item.price} د.ل</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="changeQty(${index}, -1)" class="w-6 h-6 bg-gray-200 rounded flex items-center justify-center text-gray-600 font-bold">-</button>
+                                <span class="text-sm font-bold w-4 text-center">${item.qty}</span>
+                                <button onclick="changeQty(${index}, 1)" class="w-6 h-6 bg-brand text-white rounded flex items-center justify-center font-bold">+</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            totalEl.innerText = totalPrice + ' د.ل';
+        }
+
+        function changeQty(index, delta) {
+            cart[index].qty += delta;
+            if (cart[index].qty <= 0) {
+                cart.splice(index, 1);
+            }
+            updateCartUI();
+        }
+
+        function toggleCart() {
+            const modal = document.getElementById('cart-modal');
+            const panel = document.getElementById('cart-panel');
+            
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    panel.classList.remove('translate-y-full', 'md:translate-x-full');
+                }, 10);
+            } else {
+                panel.classList.add('translate-y-full', 'md:translate-x-full');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.style.opacity = '1';
+            setTimeout(() => {
+                toast.style.opacity = '0';
+            }, 2000);
+        }
+
+        function sendOrderToWhatsapp() {
+            if (cart.length === 0) {
+                alert('السلة فارغة!');
+                return;
+            }
+
+            const name = document.getElementById('customer-name').value;
+            const address = document.getElementById('customer-address').value;
+
+            if (!name || !address) {
+                alert('الرجاء إدخال الاسم والعنوان');
+                return;
+            }
+
+            let message = `*طلب جديد من متجر SCOLIO*%0A`;
+            message += `الاسم: ${name}%0A`;
+            message += `العنوان: ${address}%0A`;
+            message += `------------------%0A`;
+            
+            let total = 0;
+            cart.forEach(item => {
+                message += `- ${item.name} (عدد ${item.qty}) بسعر ${item.price * item.qty} د.ل%0A`;
+                total += item.price * item.qty;
+            });
+
+            message += `------------------%0A`;
+            message += `*الإجمالي النهائي: ${total} د.ل*`;
+
+            const url = `https://wa.me/${PHONE_NUMBER}?text=${message}`;
+            window.open(url, '_blank');
+            
+            // تفريغ السلة بعد الطلب
+            cart = [];
+            updateCartUI();
+            toggleCart();
+        }
+
+    </script>
+</body>
+</html>
